@@ -50,7 +50,49 @@ void HistoEq(Mat &input, Mat &output) // ×÷ÎªÌáĞÑ£¬ÕâÀïÊ¹ÓÃdoubleĞÍ£¬ÏñËØÖµĞèÒªÔ
 
 }
 
-//void HistoMatch()
+void HistoMatch(Mat &input, Mat &output) // Õâ´ÎÊ¹ÓÃucharĞÍ
+{
+
+	int hist[256], cdHist[256], cdHist_out[256], inv_cdHist[256];
+	memset(hist, 0, 256 * sizeof(int));
+	memset(cdHist, 0, 256 * sizeof(int));
+	memset(cdHist_out, 0, 256 * sizeof(int));
+	memset(inv_cdHist, -1, 256 * sizeof(int));
+
+	int nRows, nCols;
+	nRows = input.rows;
+	nCols = input.cols;
+
+	for (int i = 0; i < nRows; ++i)
+	{
+		uchar *p = input.ptr<uchar>(i);
+		for (int j = 0; j < nCols; ++j)
+		{
+			hist[p[j]]++;
+		}
+	}
+
+	int pixelNum = nRows * nCols;
+	for (int i = 0; i < 256; ++i)
+	{
+		double freq = 0;
+		for (int j = 0; j <= i; ++j)
+		{
+			freq += hist[j];
+		}
+		freq /= pixelNum;
+		cdHist[i] = (int)(0.5 + freq * 255); // ËÄÉáÎåÈë×ª³ÉÕûĞÍ
+	}
+
+	// ÏÂÃæÇócdHist[]µÄ²»ÑÏ¸ñÄæ±ä»»
+	for (int i = 0; i < 256; ++i)
+	{
+		// ÒòÎªcdHist[]²»ÊÇÒ»Ò»Ó³Éä£¬»á³öÏÖcdHist[i] = cdHist[i + 1]µÄÇé¿ö£¬ 
+		// ËùÒÔinv_cdHist[]µÄÍ¬Ò»¸öÎ»ÖÃ¿ÉÄÜ±»Ğ´¶à´Î£¬¶øÓĞĞ©Î»ÖÃÈ´Ã»ÓĞ±»Ğ´¹ı£¬ĞÎ³É¼ä¶Ïµã£¬ÖµÎª³õÊ¼»¯Ê±µÄ-1
+		inv_cdHist[cdHist[i]] = i; 									
+	}
+	//´ıÌî²¹¼ä¶Ïµã£¬·½·¨ÊÇÖ±½ÓÕÒµ½×î½üµÄ·Ç¼ä¶Ïµã£¬Ê¹ÓÃÍ¬Ò»¸öÖµ
+}
 
 void main(int argc, char **argv)
 {
