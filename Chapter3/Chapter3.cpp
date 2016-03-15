@@ -92,6 +92,53 @@ void HistoMatch(Mat &input, Mat &output) // 这次使用uchar型
 		inv_cdHist[cdHist[i]] = i; 									
 	}
 	//待填补间断点，方法是直接找到最近的非间断点，使用同一个值
+	int i, j;
+	i = j = 0;
+	while (i < 255)
+	{
+		if (inv_cdHist[i + 1] != -1)
+		{
+			++i;
+			continue;
+		}
+		j = 1;
+		while (inv_cdHist[i + j] == -1 && (i + j) <= 255)
+		{
+			inv_cdHist[i + j] = inv_cdHist[i];
+			++j;
+		}
+	}
+
+	//计算output的均衡化变换
+	memset(hist, 0, 256 * sizeof(int));
+	for (int i = 0; i < nRows; ++i)
+	{
+		uchar *p = output.ptr<uchar>(i);
+		for (int j = 0; j < nCols; ++j)
+		{
+			hist[p[j]]++;
+		}
+	}
+
+	for (int i = 0; i < 256; ++i)
+	{
+		double freq = 0;
+		for (int j = 0; j <= i; ++j)
+		{
+			freq += hist[j];
+		}
+		freq /= pixelNum;
+		cdHist_out[i] = (int)(0.5 + freq * 255); // 四舍五入转成整型
+	}
+
+	for (int i = 0; i < nRows; ++i)
+	{
+		uchar *p = output.ptr<uchar>(i);
+		for (int j = 0; j < nCols; ++j)
+		{
+			p[j] = inv_cdHist[cdHist_out[p[j]]];
+		}
+	}
 }
 
 void main(int argc, char **argv)
@@ -119,6 +166,10 @@ void main(int argc, char **argv)
 	BGR_EQ.push_back(EQ_R);
 	merge(BGR_EQ, img_EQ);
 	imshow("img_EQ", img_EQ);
+	imshow("before_match", BGR[1]);
+	Mat tmp = BGR[1].clone();
+	HistoMatch(BGR[0], tmp);
+	imshow("after_match", tmp);
 
 	cvWaitKey(0);
 }
