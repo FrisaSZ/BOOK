@@ -157,18 +157,21 @@ void main(int argc, char **argv)
 	
 	imshow("Origin", img);
 
-	HistoEq(BGR[0], EQ_B);
-	HistoEq(BGR[1], EQ_G);
-	HistoEq(BGR[2], EQ_R);
+	//HistoEq(BGR[0], EQ_B);
+	//HistoEq(BGR[1], EQ_G);
+	//HistoEq(BGR[2], EQ_R);
 
-	BGR_EQ.push_back(EQ_B);
-	BGR_EQ.push_back(EQ_G);
-	BGR_EQ.push_back(EQ_R);
-	merge(BGR_EQ, img_EQ);
-	imshow("img_EQ", img_EQ);
-	imshow("before_match", BGR[1]);
-	Mat tmp = BGR[1].clone();
-	HistoMatch(BGR[0], tmp);
+	//BGR_EQ.push_back(EQ_B);
+	//BGR_EQ.push_back(EQ_G);
+	//BGR_EQ.push_back(EQ_R);
+	//merge(BGR_EQ, img_EQ);
+	//imshow("img_EQ", img_EQ);
+	imshow("B_Channel", BGR[0]);
+	imshow("G_Channel", BGR[1]);
+	imshow("R_Channel", BGR[2]);
+	imshow("before_match", BGR[0]);
+	Mat tmp = BGR[0].clone();
+	HistoMatch(BGR[1], tmp);
 	imshow("after_match", tmp);
 
 	cvWaitKey(0);
